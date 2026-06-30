@@ -1,0 +1,29 @@
+name: Lint Python Code
+
+on:                  # events that triggers the workflow
+  pull_request:      # Opening a pull request
+    branches: 
+      - master
+  push:              # pushing LOCAL commits
+    branches: 
+      - master
+  workflow_dispatch: # dispatch the workflow MANUALLY
+
+jobs:
+  lint:                           # The NAME of the job
+    runs-on: ubuntu-latest        # defines the RUNNER (type of VM to run the job on)
+    steps:                        # A job contains a sequence of tasks/steps
+      - uses: actions/checkout@v4 # Selects an action to run as part of a step
+      - uses: actions/setup-python@v5
+        with:                     # A map of the INPUT parameters (defined by the action)
+          python-version: "3.13"
+          cache: "pip"            # helps speed up workflow in future runs 
+                                  # IF the versions of a package are the same
+                                  
+      - name: Install dependencies # A name for a step to display on GitHub
+        run: |                     # Runs command-line programs using the OS's shell # pipe | symbol denotes a multi-line string. # The run command interprets the following lines as separate commands and execute them in SEQUENCE
+          python -m pip install --upgrade pip
+          python -m pip install ruff
+      
+      - name: Run Ruff
+        run: ruff check --output-format=github
