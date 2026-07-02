@@ -3,10 +3,10 @@ name: Lint Python Code. Jonnius's version
 on:                  # events that triggers the workflow
   pull_request:      # Opening a pull request
     branches: 
-      - master
+      - github-actions-tutorial
   push:              # pushing LOCAL commits
     branches: 
-      - master
+      - github-actions-tutorial
   workflow_dispatch: # dispatch the workflow MANUALLY
 
 jobs:
