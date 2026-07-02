@@ -1,4 +1,4 @@
-name: Lint Python Code
+name: Lint Python Code. Jonnius's version
 
 on:                  # events that triggers the workflow
   pull_request:      # Opening a pull request
