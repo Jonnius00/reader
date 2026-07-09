@@ -2,12 +2,13 @@ name: Lint Python Code. Jonnius's version
 
 on:                  # events that triggers the workflow
   pull_request:      # Opening a pull request
-    branches: 
+    branches:        # [ master ] # was originally
       - github-actions-tutorial
-  push:              # pushing LOCAL commits
-    branches: 
+  push:              # pushing LOCAL? commits
+    branches:        # [ master, github-actions-tutorial ] # monitors both
       - github-actions-tutorial
   workflow_dispatch: # dispatch the workflow MANUALLY
+# used to rerun a workflow failed for reasons unrelated to code changes, e.g. an expired API key
 
 jobs:
   lint:                           # The NAME of the job
@@ -15,7 +16,7 @@ jobs:
     steps:                        # A job contains a sequence of tasks/steps
       - uses: actions/checkout@v4 # Selects an action to run as part of a step
       - uses: actions/setup-python@v5
-        with:                     # A map of the INPUT parameters (defined by the action)
+        with:                 # A map of INPUT parameters (defined by action)
           python-version: "3.13"
           cache: "pip"            # helps speed up workflow in future runs 
                                   # IF the versions of a package are the same
@@ -25,5 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install ruff
       
-      - name: Run Ruff
+      - name: Run Ruff linter
         run: ruff check --output-format=github
+        
+      # alternatively runs Ruff via GitHub Action 
+      # abiding the rules specified in the project's configuration
+      # https://github.com/astral-sh/ruff-action
+      # - uses: astral-sh/ruff-action@v4.0.0  # basic linter
