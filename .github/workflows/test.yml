@@ -17,3 +17,20 @@ on:                  # events that triggers the workflow
 
   workflow_dispatch: # dispatch the workflow MANUALLY
 # used to rerun a workflow failed for reasons unrelated to code changes, e.g. an expired API key
+
+jobs:
+  testing:
+    strategy:  # lets use variables in a SINGLE JOB definition to automatically create MULTIPLE JOB RUNS that are based on the combinations of the variables.
+      matrix:  # lets access any variable defined as part of the matrix with the dot (.) syntax, f.ex. matrix.python-version
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ubuntu-latest # could use the dot notation to access the os variable defined in the matrix with matrix.os.
+
+    steps: 
+      - uses: actions/checkout@v4 # Selects an action to run as part of a step
+
+      - name: Set up Python ${{ matrix.python-version }} # isn’t required but helps identify which Python version failed 
+        uses : actions/setup-python@v5
+        with: 
+          python-version: ${{ matrix.python-version }} 
+          cache : "pip"
