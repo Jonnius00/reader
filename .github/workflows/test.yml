@@ -1,0 +1,19 @@
+name: Testing workflow. Jonnius's version
+
+on:                  # events that triggers the workflow
+  push:              # pushing LOCAL? commits
+    branches:        # - github-actions-tutorial # monitors only 1
+      [ master, github-actions-tutorial ] 
+  
+  pull_request:
+    branches:        # [ master ] # was originally
+      [ master, github-actions-tutorial ] 
+  
+  workflow_call:     # indicates that this workflow can be invoked by another one
+  # Another workflow can trigger this testing workflow as one of its job steps,  ensuring it passes BEFORE moving on to next steps.
+  # Github-username/repo/path/to/workflow@version
+  # - uses: realpython/reader/.github/workflows/test.yml@master
+  # @master tells the extarnal workflow that it wants to use the version of the testing workflow from the master branch
+
+  workflow_dispatch: # dispatch the workflow MANUALLY
+# used to rerun a workflow failed for reasons unrelated to code changes, e.g. an expired API key
