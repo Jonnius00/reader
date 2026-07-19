@@ -2,7 +2,7 @@ name: Testing workflow. Jonnius's version
 
 on:                  # events that triggers the workflow
   push:              # pushing LOCAL? commits
-    branches:        # - github-actions-tutorial # monitors only 1
+    branches:        # - github-actions-tutorial # monitors only 1 branch
       [ master, github-actions-tutorial ] 
   
   pull_request:
@@ -19,11 +19,12 @@ on:                  # events that triggers the workflow
 # used to rerun a workflow failed for reasons unrelated to code changes, e.g. an expired API key
 
 jobs:
-  testing:
+  testing:     # <job.id> Each job MUST have an id to associate with the job.
     strategy:  # lets use variables in a SINGLE JOB definition to automatically create MULTIPLE JOB RUNS that are based on the combinations of the variables.
       matrix:  # lets access any variable defined as part of the matrix with the dot (.) syntax, f.ex. matrix.python-version
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
         os: [ubuntu-latest, windows-latest]
+        
     runs-on: ubuntu-latest # could use the dot notation to access the os variable defined in the matrix with matrix.os.
 
     steps: 
@@ -34,3 +35,11 @@ jobs:
         with: 
           python-version: ${{ matrix.python-version }} 
           cache : "pip"
+
+      - name : Install dependencies 
+        run: | 
+          python -m pip install --upgrade pip
+          python -m pip install .[dev] # installs the project dependencies from the pyproject.toml file 
+
+      - name: Run Pytest
+        run: pytest
