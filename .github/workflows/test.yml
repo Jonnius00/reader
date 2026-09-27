@@ -1,7 +1,7 @@
 name: Testing workflow. Jonnius's version
 
 on:                  # events that triggers the workflow
-  push:              # pushing LOCAL? commits
+  push:              # pushing REMOTE? commits
     branches:        # - github-actions-tutorial # monitors only 1 branch
       [ master, github-actions-tutorial ] 
   
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest # could use the dot notation to access the os variable defined in the matrix with matrix.os.
 
     steps: 
-      - uses: actions/checkout@v4 # Selects an action to run as part of a step
+      - uses: actions/checkout@v4 # Checkout a Git repository at a particular version
 
       - name: Set up Python ${{ matrix.python-version }} # isn’t required but helps identify which Python version failed 
         uses : actions/setup-python@v5
@@ -37,9 +37,9 @@ jobs:
           cache : "pip"
 
       - name : Install dependencies 
-        run: | 
+        run: |               # installs the project dependencies from the pyproject.toml file 
           python -m pip install --upgrade pip
-          python -m pip install .[dev] # installs the project dependencies from the pyproject.toml file 
+          python -m pip install .[dev] 
 
       - name: Run Pytest
         run: pytest
