@@ -1,0 +1,24 @@
+name: Publish to PyPI
+on:                        # events that triggers the workflow
+  push:                    # pushing commits event
+    tags:
+      - "*.*.*"
+
+jobs:
+  publish:                 # <job.id> Each job MUST have Name/id associated with it
+    runs-on: ubuntu-latest # defines RUNNER (Ubuntu VM to run the job)
+    steps:                 # job contains a sequence of tasks/steps
+      - uses: actions/checkout@v4 #Checkout a Git repository at a particular version
+
+      - name: setup Python # A name for a step to display on GitHub     
+        uses: actions/setup-Python@v5 # Set up a specific version of Python and add the command-line tools to the PATH.
+        with:              # A map of INPUT parameters defined by action
+          python-version: "3.13"
+
+      - name: Install Dependancies 
+        run: |             
+          python -m pip install --upgrade pip
+          python -m pip install .[build] 
+
+      - name: Build package  # builds the Real Python Reader package
+        run: python -m build # By default, build places distribution files in /dist folder
