@@ -2,23 +2,54 @@ name: Publish to PyPI
 on:                        # events that triggers the workflow
   push:                    # pushing commits event
     tags:
-      - "*.*.*"
+      - "*.*.*" # to trigger this workflow, tag a commit with the version name
+                # git tag -a "1.0.0" -m "1.0.0"
+                # git push --tags
 
 jobs:
   publish:                 # <job.id> Each job MUST have Name/id associated with it
     runs-on: ubuntu-latest # defines RUNNER (Ubuntu VM to run the job)
     steps:                 # job contains a sequence of tasks/steps
-      - uses: actions/checkout@v4 #Checkout a Git repository at a particular version
+      
+      ##### PREPEARING #####
+      - uses: actions/checkout@v4 # Checkout a Git repository at a particular version
 
       - name: setup Python # A name for a step to display on GitHub     
-        uses: actions/setup-Python@v5 # Set up a specific version of Python and add the command-line tools to the PATH.
+        uses: actions/setup-Python@v5 # Set up a specific version of Python and add the CLI tools to the PATH.
         with:              # A map of INPUT parameters defined by action
           python-version: "3.13"
 
-      - name: Install Dependancies 
-        run: |             
+      - name: Install Dependencies 
+        run: | # Runs CLI programs using OS's shell # pipe | symbol denotes a multi-line string. # The run command interprets the following lines as separate commands and execute them in SEQUENCE            
           python -m pip install --upgrade pip
           python -m pip install .[build] 
 
       - name: Build package  # builds the Real Python Reader package
         run: python -m build # By default, build places distribution files in /dist folder
+
+      ##### PUBLISHING #####
+      - name: Test publishing package
+        uses: pypa/gh-action-pypi-publish@release/v1 # by default, it looks in the /dist folder for any new version of a package to upload
+        with: 
+          user: __token__ # tells the GitHub Action that token authentication is being used 
+          password: ${{ secrets.PYPI_API_TOKEN }} 
+          repository-url: http://test.pypi.org/legacy
+
+      - name: Publishing packege
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with: 
+          user: __token__ 
+          password: ${{ secrets.PYPI_API_TOKEN }} 
+
+      ##### RELEASING #####
+      - name: Create Github release
+        env:   # Any key-values pair in env will be set as env variables for the CURRENT step
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # assigns GitHub token from the secrets context to env variable GITHUB_TOKEN
+        run: | # gh is GitHub CLI  # not sure this pipe is needed
+         gh release create ${{ github.ref_name }} ./dist/* --generate-notes 
+        # github.ref_name will be replaced with the attribute that triggered the workflow, in this case is the Git tag’s name 
+        # gh command CREATES a release with the SAME name as the TAG used to trigger the release, 
+        # UPLOADS all files from ./dist, and AUTO-GENERATE release notes. 
+        
+        # These release notes include any PRs that developers have merged 
+        # since they created the last release, giving proper credit to the authors with links and usernames for their contributions.
